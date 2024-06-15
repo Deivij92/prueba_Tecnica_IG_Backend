@@ -20,6 +20,9 @@ public class Prestamo {
     @Column(nullable = false)
     private LocalDate fechaDesembolso;
 
+    @Column(nullable = false)
+    private LocalDate fechaSolicitud;
+
     private String estadoSolicitud; //Aprobado o no
 
     @Column(nullable = false)
@@ -97,5 +100,13 @@ public class Prestamo {
 
     public void setDescripcionCredito(String descripcionCredito) {
         this.descripcionCredito = descripcionCredito;
+    }
+
+    public LocalDate getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(LocalDate fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 }

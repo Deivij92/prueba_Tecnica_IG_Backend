@@ -1,11 +1,9 @@
 package com.ig.test.service.impl;
 
-import com.ig.test.dto.ClienteDto;
-import com.ig.test.dto.InfoLaboralClienteDto;
-import com.ig.test.dto.ReferenciasClientesDto;
-import com.ig.test.dto.ResponseDto;
+import com.ig.test.dto.*;
 import com.ig.test.model.Cliente;
 import com.ig.test.model.InfoLaboralCliente;
+import com.ig.test.model.Prestamo;
 import com.ig.test.model.ReferenciasClientes;
 import com.ig.test.model.repository.RepositoryCliente;
 import com.ig.test.model.repository.RepositoryInfoLAboral;
@@ -116,6 +114,17 @@ public class CleinteServiceImpl implements ServiceCliente {
         } catch (Exception e) {
             return new ResponseDto(500, "Error al guardar las referencias: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<ClienteDto> listarClientes() {
+        List<Cliente> clientes =  clienteRepository.findAll();
+        List<ClienteDto> clienteDtoList =  new ArrayList<>();
+        for (Cliente clien : clientes){
+            ClienteDto clienteDto =  convertirDatos.convertToDtoCliente(clien);
+            clienteDtoList.add(clienteDto);
+        }
+        return clienteDtoList;
     }
 
 

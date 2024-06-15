@@ -4,6 +4,8 @@ import com.ig.test.dto.*;
 import com.ig.test.model.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class ConvertirDatos {
 
@@ -21,9 +23,6 @@ public class ConvertirDatos {
     }
 
     public ClienteDto convertToDtoCliente(Cliente cliente) {
-        if (cliente == null) {
-            return null;
-        }
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(cliente.getId());
         clienteDto.setTipoDocumento(cliente.getTipoDocumento());
@@ -32,6 +31,7 @@ public class ConvertirDatos {
         clienteDto.setResidencia(cliente.getResidencia());
         clienteDto.setCiudad(cliente.getCiudad());
         clienteDto.setTelefono(cliente.getTelefono());
+        clienteDto.setEmail(cliente.getEmail());
         return clienteDto;
     }
 
@@ -83,10 +83,27 @@ public class ConvertirDatos {
         prestamo.setFechaDesembolso(dto.getFechaDesembolso());
         prestamo.setEstadoSolicitud(dto.getEstadoSolicitud());
         prestamo.setDescripcionCredito(dto.getDescripcionCredito());
+        prestamo.setFechaSolicitud(LocalDate.now());
 
         // Si 'idPrestamo' es generado automáticamente en la base de datos, no necesitas asignarlo aquí
         return prestamo;
     }
+    public PrestamoDto convertirEntityADtoPrestao(Prestamo prestamo) {
+        PrestamoDto dto = new PrestamoDto();
+        dto.setIdPrestamo(prestamo.getIdPrestamo());
+        dto.setMonto(prestamo.getMonto());
+        dto.setPlazo(prestamo.getPlazo());
+        dto.setFechaDesembolso(prestamo.getFechaDesembolso());
+        dto.setEstadoSolicitud(prestamo.getEstadoSolicitud());
+        dto.setDescripcionCredito(prestamo.getDescripcionCredito());
+        dto.setIdcliente(prestamo.getCliente().getNumeroDocumento());
+        dto.setIdlineaCredito(prestamo.getLineaCredito().getNombreLineaCredito());
+        dto.setFechaSolicitud(prestamo.getFechaSolicitud());
+        // Asigna otros campos si es necesario
+
+        return dto;
+    }
+
     public LineaCreditoDto convertirALineaCreditoDto(LineaCredito lineaCredito) {
         LineaCreditoDto lineaCreditoDto = new LineaCreditoDto();
         // Aquí establece las propiedades del DTO usando las propiedades de la entidad

@@ -11,5 +11,6 @@ public interface PrestamoService {
     ResponseDto solictarPrestamo (PrestamoDto prestamoDto);
 
     List<LineaCreditoDto> listarPrestamos();
+    List<PrestamoDto> listarPrestamosSolicitados();
 
 }

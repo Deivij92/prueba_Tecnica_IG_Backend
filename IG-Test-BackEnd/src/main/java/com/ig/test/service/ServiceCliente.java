@@ -13,4 +13,6 @@ public interface ServiceCliente {
 
     ResponseDto saveReferencias(List<ReferenciasClientesDto> referenciasClientesDtos);
 
+    List<ClienteDto> listarClientes();
+
 }

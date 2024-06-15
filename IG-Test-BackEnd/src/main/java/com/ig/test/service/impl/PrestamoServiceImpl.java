@@ -64,7 +64,7 @@ public class PrestamoServiceImpl implements PrestamoService {
             prestamo.setLineaCredito(lineaDePrestamoExistente.get());
             repositoryPrestamo.save(prestamo);
             // Devolver una respuesta exitosa si la solicitud se procesa correctamente
-            return new ResponseDto(200, "Solicitud de préstamo procesada correctamente");
+            return new ResponseDto(200, "Solicitud de préstamo procesada y aprobada correctamente");
         } catch (Exception e) {
             // Devolver una respuesta de error si ocurre alguna excepción durante el procesamiento
             return new ResponseDto(500, "Error al procesar la solicitud de préstamo: " + e.getMessage());
@@ -84,6 +84,17 @@ public class PrestamoServiceImpl implements PrestamoService {
         }
 
         return lineasDeCreditoDto;
+    }
+
+    @Override
+    public List<PrestamoDto> listarPrestamosSolicitados() {
+        List<Prestamo> prestamo =  repositoryPrestamo.findAll();
+        List<PrestamoDto> prestamoDtos =  new ArrayList<>();
+        for (Prestamo prest : prestamo){
+            PrestamoDto prestamoDto =  convertirDatos.convertirEntityADtoPrestao(prest);
+            prestamoDtos.add(prestamoDto);
+        }
+        return prestamoDtos;
     }
 
 

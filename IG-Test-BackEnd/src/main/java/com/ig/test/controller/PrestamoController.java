@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("api/dinerofacil")
 public class PrestamoController {
 
@@ -27,15 +28,20 @@ public class PrestamoController {
             if (response.getCodeResponse() == 200) {
                 return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.status(HttpStatus.OK).body(response);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseDto(500, "Error al procesar la solicitud de préstamo: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto(500, "Error al procesar la solicitud de préstamo: " + e.getMessage()));
         }
     }
-    @GetMapping("/listarLineaCredito")
-    public List<LineaCreditoDto> listarPrestamos() {
+    @PostMapping("/listarLineaCredito")
+    public List<LineaCreditoDto> listaeProductos() {
         return prestamoService.listarPrestamos();
     }
+    @PostMapping("/prestamoslist")
+    public List<PrestamoDto> listarPrestamosSolictados() {
+        return prestamoService.listarPrestamosSolicitados();
+    }
+
 
 }

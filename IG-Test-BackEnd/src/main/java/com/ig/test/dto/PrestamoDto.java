@@ -12,6 +12,8 @@ public class PrestamoDto {
     private String idcliente;
     private String descripcionCredito;
 
+    private LocalDate fechaSolicitud;
+
     public Long getIdPrestamo() {
         return idPrestamo;
     }
@@ -74,5 +76,13 @@ public class PrestamoDto {
 
     public void setDescripcionCredito(String descripcionCredito) {
         this.descripcionCredito = descripcionCredito;
+    }
+
+    public LocalDate getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(LocalDate fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 }
