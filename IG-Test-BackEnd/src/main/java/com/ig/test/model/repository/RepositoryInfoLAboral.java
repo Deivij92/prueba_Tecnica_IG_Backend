@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface RepositoryInfoLAboral extends JpaRepository<InfoLaboralCliente, Long> {
     Optional<InfoLaboralCliente> findByCliente(Cliente cliente);
-    Optional<InfoLaboralCliente> findByClienteId(long idCliente);
+    Optional<InfoLaboralCliente> findById(long idCliente);
+
 }

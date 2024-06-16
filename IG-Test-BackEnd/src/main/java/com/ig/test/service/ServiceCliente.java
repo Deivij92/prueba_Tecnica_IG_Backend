@@ -21,5 +21,8 @@ public interface ServiceCliente {
 
     ResponseDto saveReferencias(List<ReferenciasClientesDto> referenciasClientesDtos);
     List<ReferenciasClientesDto> obtnerReferencias(long idCliente);
+    ReferenciasClientesDto obtnerInfoReferencias(long idCliente);
+    ResponseDto UpdateInfoRef(ReferenciasClientesDto  dto);
+    ResponseDto deleteInfoRef(long idcliente);
 
 }

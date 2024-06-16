@@ -46,13 +46,11 @@ public class ClienteController {
         ResponseDto responseDto = serviceCliente.DeleteInfoCliente(idCliente);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-
     @DeleteMapping("/{id}/laboral")
     public ResponseEntity<ResponseDto> deleteInfoLab(@PathVariable("id") long idCliente) {
         ResponseDto responseDto = serviceCliente.deleteInfoLaboral(idCliente);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
-
     @PostMapping("/add-inf-lab")
     public ResponseEntity<ResponseDto> crearInfoLab(@RequestBody InfoLaboralClienteDto infoLaboralClienteDto) {
         ResponseDto responseDto = serviceCliente.saveInfoLaboral(infoLaboralClienteDto);
@@ -76,7 +74,6 @@ public class ClienteController {
     public List<ClienteDto> listarClientes() {
         return serviceCliente.listarClientes();
     }
-
     @GetMapping("/{idCliente}/infoLaboral")
     public ResponseEntity<InfoLaboralClienteDto> obtenerInfoLaboral(@PathVariable long idCliente) {
         InfoLaboralClienteDto infoLaboral =serviceCliente.obtenerInfoLAboral(idCliente);
@@ -87,13 +84,20 @@ public class ClienteController {
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
     }
-
     @GetMapping("/{idCliente}/referencias")
     public ResponseEntity<List<ReferenciasClientesDto>> obtenerReferencias(@PathVariable long idCliente) {
         List<ReferenciasClientesDto> referencias = serviceCliente.obtnerReferencias(idCliente);
         return ResponseEntity.ok(referencias);
     }
-
+    @GetMapping("/referencia/{idReferencia}")
+    public ResponseEntity<ReferenciasClientesDto> obtenerReferencia(@PathVariable long idReferencia) {
+        ReferenciasClientesDto referencia = serviceCliente.obtnerInfoReferencias(idReferencia);
+        if (referencia != null) {
+            return ResponseEntity.ok(referencia);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     @PostMapping("/updateinfolab")
     public ResponseEntity<ResponseDto> modificarInfoLaboral(@RequestBody InfoLaboralClienteDto dto) {
         ResponseDto response = serviceCliente.modificarInfoLaboral(dto);
@@ -102,5 +106,15 @@ public class ClienteController {
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+    }
+    @DeleteMapping("/deleteref/{idRef}")
+    public ResponseEntity<ResponseDto> eliminarReferencia(@PathVariable long idRef) {
+        ResponseDto response = serviceCliente.deleteInfoRef(idRef);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PutMapping("/updatereferencia")
+    public ResponseEntity<ResponseDto> actualizarReferencia(@RequestBody ReferenciasClientesDto dto) {
+        ResponseDto response = serviceCliente.UpdateInfoRef(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

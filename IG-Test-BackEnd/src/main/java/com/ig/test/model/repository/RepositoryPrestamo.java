@@ -11,4 +11,5 @@ public interface RepositoryPrestamo extends JpaRepository<Prestamo, Long> {
 
 
     List<Prestamo> findByClienteId(long cliente);
+    List<Prestamo> findByCliente(Cliente cliente);
 }

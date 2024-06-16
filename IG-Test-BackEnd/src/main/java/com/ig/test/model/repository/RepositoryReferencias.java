@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface RepositoryReferencias extends JpaRepository<ReferenciasClientes, Long> {
     List<ReferenciasClientes> findByCliente(Cliente cliente);
     List<ReferenciasClientes> findByClienteId(long cliente);
+    Optional<ReferenciasClientes> findByNumeroDocumento(String numeroDocumento);
 }

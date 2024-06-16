@@ -108,27 +108,28 @@ public class CleinteServiceImpl implements ServiceCliente {
     public ResponseDto DeleteInfoCliente(long idCliente) {
         ResponseDto response = new ResponseDto();
         try {
-            // Eliminar préstamos asociados al cliente
-            List<Prestamo> prestamos = repositoryPrestamo.findByClienteId(idCliente);
-            for (Prestamo prestamo : prestamos) {
-                repositoryPrestamo.delete(prestamo);
-            }
-
-            // Eliminar referencias asociadas al cliente
-            List<ReferenciasClientes> referencias = repositoryReferencias.findByClienteId(idCliente);
-            for (ReferenciasClientes referencia : referencias) {
-                repositoryReferencias.delete(referencia);
-            }
-
-            // Eliminar información laboral asociada al cliente
-            Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findByClienteId(idCliente);
-            infoLaboralOptional.ifPresent(infoLaboral -> repositoryInfoLAboral.delete(infoLaboral));
-
-            // Finalmente, eliminar el cliente
+            // Verificar si el cliente existe en la base de datos
             Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
             if (clienteOptional.isPresent()) {
                 Cliente cliente = clienteOptional.get();
+
+                // Eliminar referencias asociadas
+                List<ReferenciasClientes> referencias = repositoryReferencias.findByCliente(cliente);
+                for (ReferenciasClientes referencia : referencias) {
+                    repositoryReferencias.delete(referencia);
+                }
+
+                // Eliminar información laboral asociada
+
+                // Eliminar solicitudes de préstamo asociadas
+                List<Prestamo> prestamos = repositoryPrestamo.findByCliente(cliente);
+                for (Prestamo prestamo : prestamos) {
+                    repositoryPrestamo.delete(prestamo);
+                }
+
+                // Eliminar el cliente
                 clienteRepository.delete(cliente);
+
                 response.setCodeResponse(200);
                 response.setMessageResponse("Cliente eliminado correctamente");
             } else {
@@ -141,6 +142,7 @@ public class CleinteServiceImpl implements ServiceCliente {
         }
         return response;
     }
+
 
     @Override
     public ResponseDto saveInfoLaboral(InfoLaboralClienteDto infoLaboralClienteDto) {
@@ -173,7 +175,11 @@ public class CleinteServiceImpl implements ServiceCliente {
             for (ReferenciasClientesDto dto : referenciasClientesDtos) {
                 Optional<Cliente> clienteExistente = Optional.ofNullable(clienteRepository.findById(dto.getIdcliente()));
                 if (!clienteExistente.isPresent()) {
-                    return new ResponseDto(404, "Cliente con ID " + dto.getIdcliente() + " no encontrado");
+                    return new ResponseDto(204, "Cliente con ID " + dto.getIdcliente() + " no encontrado");
+                }
+                Optional<ReferenciasClientes> referenciasExiste = repositoryReferencias.findByNumeroDocumento(dto.getNumeroDocumento());
+                if (referenciasExiste.isPresent()) {
+                    return new ResponseDto(409, "Referencia con la cedula  " + dto.getNumeroDocumento() + " ya existe");
                 }
                 ReferenciasClientes referenciaCliente = convertirDatos.convertToEntityReferenciasClientes(dto);
                 referenciaCliente.setCliente(clienteExistente.get()); // Asignamos el cliente a la referencia
@@ -224,11 +230,8 @@ public class CleinteServiceImpl implements ServiceCliente {
     public ResponseDto deleteInfoLaboral(long idCliente) {
         ResponseDto response = new ResponseDto();
         try {
-            // Verificar si el cliente existe en la base de datos
-            Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
-            if (clienteOptional.isPresent()) {
                 // Buscar la información laboral asociada al cliente
-                Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findByClienteId(idCliente);
+                Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findById(idCliente);
                 if (infoLaboralOptional.isPresent()) {
                     // Eliminar la información laboral
                     InfoLaboralCliente infoLaboral = infoLaboralOptional.get();
@@ -239,17 +242,34 @@ public class CleinteServiceImpl implements ServiceCliente {
                     response.setCodeResponse(404); // Información laboral no encontrada
                     response.setMessageResponse("Información laboral no encontrada para el cliente");
                 }
-            } else {
-                response.setCodeResponse(404); // Cliente no encontrado
-                response.setMessageResponse("Cliente no encontrado");
-            }
         } catch (Exception e) {
             response.setCodeResponse(500); // Error interno del servidor
             response.setMessageResponse("Error al eliminar la información laboral: " + e.getMessage());
         }
         return response;
     }
-
+    @Override
+    @Transactional
+    public ResponseDto deleteInfoRef(long idRef) {
+        ResponseDto response = new ResponseDto();
+        try {
+            // Verificar si la referencia existe en la base de datos
+            Optional<ReferenciasClientes> referenciaOptional = repositoryReferencias.findById(idRef);
+            if (referenciaOptional.isPresent()) {
+                // Eliminar la referencia de la base de datos
+                repositoryReferencias.deleteById(idRef);
+                response.setCodeResponse(200);
+                response.setMessageResponse("Referencia eliminada correctamente");
+            } else {
+                response.setCodeResponse(404); // Referencia no encontrada
+                response.setMessageResponse("Referencia no encontrada");
+            }
+        } catch (Exception e) {
+            response.setCodeResponse(500); // Error interno del servidor
+            response.setMessageResponse("Error al eliminar la referencia: " + e.getMessage());
+        }
+        return response;
+    }
     @Override
     public List<ReferenciasClientesDto> obtnerReferencias(long idCliente) {
         Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
@@ -262,7 +282,6 @@ public class CleinteServiceImpl implements ServiceCliente {
         }
         return Collections.emptyList(); // Retornar una lista vacía si el cliente no existe
     }
-
     public ResponseDto modificarInfoLaboral(InfoLaboralClienteDto dto) {
         Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findById(dto.getIdInfoLab());
 
@@ -287,5 +306,46 @@ public class CleinteServiceImpl implements ServiceCliente {
         repositoryInfoLAboral.save(infoLaboral);
         return new ResponseDto(200, "Información laboral actualizada correctamente");
     }
+    @Override
+    public ReferenciasClientesDto obtnerInfoReferencias(long idReferencia) {
+        Optional<ReferenciasClientes> referenciaOptional = repositoryReferencias.findById(idReferencia);
+        if (referenciaOptional.isPresent()) {
+            ReferenciasClientes referencia = referenciaOptional.get();
+            return convertirDatos.convertToDtoReferenciaCliente(referencia);
+        }
+        // Si la referencia no existe, devuelve null o maneja esto de otra manera
+        return new ReferenciasClientesDto();
+    }
+    @Override
+    public ResponseDto UpdateInfoRef(ReferenciasClientesDto dto) {
+        ResponseDto response = new ResponseDto();
+        try {
+            Optional<ReferenciasClientes> referenciaOptional = repositoryReferencias.findById(dto.getIdRef());
+            if (referenciaOptional.isPresent()) {
+                ReferenciasClientes referencia = referenciaOptional.get();
+                // Actualizar los campos de la referencia con los datos del DTO
+                referencia.setTipoDocumento(dto.getTipoDocumento());
+                referencia.setNumeroDocumento(dto.getNumeroDocumento());
+                referencia.setNombresApellidos(dto.getNombresApellidos());
+                referencia.setResidencia(dto.getResidencia());
+                referencia.setCiudad(dto.getCiudad());
+                referencia.setTelefono(dto.getTelefono());
+                referencia.setParentezco(dto.getParentezco());
+
+                // Guardar la referencia actualizada en la base de datos
+                repositoryReferencias.save(referencia);
+
+                response.setCodeResponse(200);
+                response.setMessageResponse("Referencia actualizada correctamente");
+            } else {
+                response.setCodeResponse(404); // Referencia no encontrada
+                response.setMessageResponse("Referencia no encontrada");
+            }
+        } catch (Exception e) {
+            response.setCodeResponse(500); // Error interno del servidor
+            response.setMessageResponse("Error al actualizar la referencia: " + e.getMessage());
+        }
+        return response;
+      }
 
 }
