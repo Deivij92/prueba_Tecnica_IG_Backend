@@ -76,6 +76,20 @@ public class ConvertirDatos {
         return referencia;
     }
 
+    public ReferenciasClientesDto convertToDtoReferenciaCliente(ReferenciasClientes referencia) {
+        ReferenciasClientesDto dto = new ReferenciasClientesDto();
+        dto.setTipoDocumento(referencia.getTipoDocumento());
+        dto.setNumeroDocumento(referencia.getNumeroDocumento());
+        dto.setNombresApellidos(referencia.getNombresApellidos());
+        dto.setResidencia(referencia.getResidencia());
+        dto.setCiudad(referencia.getCiudad());
+        dto.setTelefono(referencia.getTelefono());
+        dto.setParentezco(referencia.getParentezco());
+        dto.setIdcliente(referencia.getCliente().getId());
+        dto.setIdRef(referencia.getId());
+        return dto;
+    }
+
     public Prestamo convertirDtoAEntity(PrestamoDto dto) {
         Prestamo prestamo = new Prestamo();
         prestamo.setMonto(dto.getMonto());
@@ -112,7 +126,6 @@ public class ConvertirDatos {
         lineaCreditoDto.setValorMinimo(lineaCredito.getValorMinimo());
         lineaCreditoDto.setNombreLineaCredito(lineaCredito.getNombreLineaCredito());
         lineaCreditoDto.setPlazoMaximo(lineaCreditoDto.getPlazoMaximo());
-
 
         return lineaCreditoDto;
     }

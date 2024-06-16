@@ -9,10 +9,17 @@ import java.util.List;
 
 public interface ServiceCliente {
     ResponseDto saveCliente(ClienteDto clienteDto);
+    ClienteDto ObtenerInfoCliente(long idcleinte);
+    List<ClienteDto> listarClientes();
+    ResponseDto updateInfoCliente(ClienteDto clienteDto);
+    ResponseDto DeleteInfoCliente(long idcliente);
+
     ResponseDto saveInfoLaboral(InfoLaboralClienteDto infoLaboralClienteDto);
+    ResponseDto modificarInfoLaboral(InfoLaboralClienteDto infoLaboralClienteDto);
+    InfoLaboralClienteDto obtenerInfoLAboral(long idCliente);
+    ResponseDto deleteInfoLaboral(long idcliente);
 
     ResponseDto saveReferencias(List<ReferenciasClientesDto> referenciasClientesDtos);
-
-    List<ClienteDto> listarClientes();
+    List<ReferenciasClientesDto> obtnerReferencias(long idCliente);
 
 }

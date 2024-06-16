@@ -38,7 +38,7 @@ public class PrestamoController {
     public List<LineaCreditoDto> listaeProductos() {
         return prestamoService.listarPrestamos();
     }
-    @PostMapping("/prestamoslist")
+    @GetMapping("/prestamoslist")
     public List<PrestamoDto> listarPrestamosSolictados() {
         return prestamoService.listarPrestamosSolicitados();
     }

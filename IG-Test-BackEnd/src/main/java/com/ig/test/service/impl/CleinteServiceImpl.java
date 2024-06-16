@@ -7,18 +7,22 @@ import com.ig.test.model.Prestamo;
 import com.ig.test.model.ReferenciasClientes;
 import com.ig.test.model.repository.RepositoryCliente;
 import com.ig.test.model.repository.RepositoryInfoLAboral;
+import com.ig.test.model.repository.RepositoryPrestamo;
 import com.ig.test.model.repository.RepositoryReferencias;
 import com.ig.test.service.ServiceCliente;
 import com.ig.test.util.ConvertirDatos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CleinteServiceImpl implements ServiceCliente {
     @Autowired
     private RepositoryCliente clienteRepository;
@@ -29,6 +33,8 @@ public class CleinteServiceImpl implements ServiceCliente {
     @Autowired
     RepositoryReferencias repositoryReferencias;
 
+    @Autowired
+    private RepositoryPrestamo repositoryPrestamo;
     @Autowired
     private ConvertirDatos convertirDatos;
     @Override
@@ -55,21 +61,86 @@ public class CleinteServiceImpl implements ServiceCliente {
         }
     }
 
-
- /*   @Override
-    public ResponseDto updateCliente(ClienteDto clienteDto) {
-        return null;
+    @Override
+    public ClienteDto ObtenerInfoCliente(long idCliente) {
+        Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
+        if (clienteOptional.isPresent()) {
+            Cliente cliente = clienteOptional.get();
+            return convertirDatos.convertToDtoCliente(cliente);
+        }
+      return new ClienteDto();
     }
 
     @Override
-    public ClienteDto getClienteById(Long clienteId) {
-        return null;
+    public ResponseDto updateInfoCliente(ClienteDto clienteDto) {
+        ResponseDto response = new ResponseDto();
+        try {
+            // Verificar si el cliente existe en la base de datos
+            Optional<Cliente> clienteOptional = clienteRepository.findById(clienteDto.getId());
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                // Actualizar los campos del cliente con los valores del ClienteDto
+                cliente.setTipoDocumento(clienteDto.getTipoDocumento());
+                cliente.setNumeroDocumento(clienteDto.getNumeroDocumento());
+                cliente.setApellidos(clienteDto.getApellidos());
+                cliente.setResidencia(clienteDto.getResidencia());
+                cliente.setCiudad(clienteDto.getCiudad());
+                cliente.setTelefono(clienteDto.getTelefono());
+                cliente.setEmail(clienteDto.getEmail());
+                // Guardar el cliente actualizado en la base de datos
+                clienteRepository.save(cliente);
+                response.setCodeResponse(200);
+                response.setMessageResponse("Cliente actualizado correctamente");
+            } else {
+                response.setCodeResponse(404); // Cliente no encontrado
+                response.setMessageResponse("Cliente no encontrado");
+            }
+        } catch (Exception e) {
+            response.setCodeResponse(500); // Error interno del servidor
+            response.setMessageResponse("Error al actualizar el cliente: " + e.getMessage());
+        }
+
+        return response;
     }
 
     @Override
-    public ResponseDto deleteCliente(Long clienteId) {
-        return null;
-    }*/
+    @Transactional
+    public ResponseDto DeleteInfoCliente(long idCliente) {
+        ResponseDto response = new ResponseDto();
+        try {
+            // Eliminar préstamos asociados al cliente
+            List<Prestamo> prestamos = repositoryPrestamo.findByClienteId(idCliente);
+            for (Prestamo prestamo : prestamos) {
+                repositoryPrestamo.delete(prestamo);
+            }
+
+            // Eliminar referencias asociadas al cliente
+            List<ReferenciasClientes> referencias = repositoryReferencias.findByClienteId(idCliente);
+            for (ReferenciasClientes referencia : referencias) {
+                repositoryReferencias.delete(referencia);
+            }
+
+            // Eliminar información laboral asociada al cliente
+            Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findByClienteId(idCliente);
+            infoLaboralOptional.ifPresent(infoLaboral -> repositoryInfoLAboral.delete(infoLaboral));
+
+            // Finalmente, eliminar el cliente
+            Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                clienteRepository.delete(cliente);
+                response.setCodeResponse(200);
+                response.setMessageResponse("Cliente eliminado correctamente");
+            } else {
+                response.setCodeResponse(404); // Cliente no encontrado
+                response.setMessageResponse("Cliente no encontrado");
+            }
+        } catch (Exception e) {
+            response.setCodeResponse(500); // Error interno del servidor
+            response.setMessageResponse("Error al eliminar el cliente: " + e.getMessage());
+        }
+        return response;
+    }
 
     @Override
     public ResponseDto saveInfoLaboral(InfoLaboralClienteDto infoLaboralClienteDto) {
@@ -127,19 +198,94 @@ public class CleinteServiceImpl implements ServiceCliente {
         return clienteDtoList;
     }
 
+    @Override
+    public InfoLaboralClienteDto obtenerInfoLAboral(long idCliente) {
+        Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
 
-/*    @Override
-    public ResponseDto updateInfoLaboral(InfoLaboralClienteDto infoLaboralClienteDto) {
-        return null;
+        if (clienteOptional.isPresent()) {
+            Cliente cliente = clienteOptional.get();
+            Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findByCliente(cliente);
+
+            if (infoLaboralOptional.isPresent()) {
+                InfoLaboralCliente infoLaboral = infoLaboralOptional.get();
+                return convertirDatos.convertToDtoInfoLaboral(infoLaboral);
+            } else {
+                // Maneja el caso cuando no se encuentra la información laboral
+                return new InfoLaboralClienteDto(); // o null, dependiendo de tu lógica de negocio
+            }
+        } else {
+            // Maneja el caso cuando no se encuentra el cliente
+            return new InfoLaboralClienteDto(); // o null, dependiendo de tu lógica de negocio
+        }
     }
 
     @Override
-    public InfoLaboralClienteDto getInfoLaboralByClienteId(Long clienteId) {
-        return null;
+    @Transactional
+    public ResponseDto deleteInfoLaboral(long idCliente) {
+        ResponseDto response = new ResponseDto();
+        try {
+            // Verificar si el cliente existe en la base de datos
+            Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
+            if (clienteOptional.isPresent()) {
+                // Buscar la información laboral asociada al cliente
+                Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findByClienteId(idCliente);
+                if (infoLaboralOptional.isPresent()) {
+                    // Eliminar la información laboral
+                    InfoLaboralCliente infoLaboral = infoLaboralOptional.get();
+                    repositoryInfoLAboral.delete(infoLaboral);
+                    response.setCodeResponse(200);
+                    response.setMessageResponse("Información laboral eliminada correctamente");
+                } else {
+                    response.setCodeResponse(404); // Información laboral no encontrada
+                    response.setMessageResponse("Información laboral no encontrada para el cliente");
+                }
+            } else {
+                response.setCodeResponse(404); // Cliente no encontrado
+                response.setMessageResponse("Cliente no encontrado");
+            }
+        } catch (Exception e) {
+            response.setCodeResponse(500); // Error interno del servidor
+            response.setMessageResponse("Error al eliminar la información laboral: " + e.getMessage());
+        }
+        return response;
     }
 
     @Override
-    public ResponseDto deleteInfoLaboral(Long clienteId) {
-        return null;
-    }*/
+    public List<ReferenciasClientesDto> obtnerReferencias(long idCliente) {
+        Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
+        if (clienteOptional.isPresent()) {
+            Cliente cliente = clienteOptional.get();
+            List<ReferenciasClientes> referencias = repositoryReferencias.findByCliente(cliente);
+            return referencias.stream()
+                    .map(referencia -> convertirDatos.convertToDtoReferenciaCliente(referencia))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList(); // Retornar una lista vacía si el cliente no existe
+    }
+
+    public ResponseDto modificarInfoLaboral(InfoLaboralClienteDto dto) {
+        Optional<InfoLaboralCliente> infoLaboralOptional = repositoryInfoLAboral.findById(dto.getIdInfoLab());
+
+        if (!infoLaboralOptional.isPresent()) {
+            return new ResponseDto(409, "No se encontró la información laboral con el ID proporcionado");
+        }
+
+        InfoLaboralCliente infoLaboral = infoLaboralOptional.get();
+
+        infoLaboral.setNitEmpresa(dto.getNitEmpresa());
+        infoLaboral.setNombreEmpresa(dto.getNombreEmpresa());
+        infoLaboral.setDireccion(dto.getDireccion());
+        infoLaboral.setTelefono(dto.getTelefono());
+        infoLaboral.setCargo(dto.getCargo());
+        infoLaboral.setFechaVinculacion(dto.getFechaVinculacion());
+
+        Optional<Cliente> clienteOptional = clienteOptional = Optional.ofNullable(clienteRepository.findById(Long.parseLong(dto.getIdcliente())));
+        if (!clienteOptional.isPresent()) {
+            return new ResponseDto(409, "No se encontró el cliente con el ID proporcionado");
+        }
+        infoLaboral.setCliente(clienteOptional.get());
+        repositoryInfoLAboral.save(infoLaboral);
+        return new ResponseDto(200, "Información laboral actualizada correctamente");
+    }
+
 }

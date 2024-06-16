@@ -29,7 +29,7 @@ public class InfoLaboralCliente {
     @Column(nullable = false)
     private LocalDate fechaVinculacion;
 
-    @ManyToOne(targetEntity = Cliente.class, fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToOne(targetEntity = Cliente.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 

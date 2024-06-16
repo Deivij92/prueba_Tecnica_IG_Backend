@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.transform.OutputKeys;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +27,32 @@ public class ClienteController {
     public ResponseEntity<ResponseDto> crearCliente(@RequestBody ClienteDto clienteDto) {
         ResponseDto responseDto = serviceCliente.saveCliente(clienteDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }@PostMapping("/actualizar")
+    public ResponseEntity<ResponseDto> actualizarCliente(@RequestBody ClienteDto clienteDto) {
+        ResponseDto responseDto = serviceCliente.updateInfoCliente(clienteDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
+    @GetMapping("/{idCliente}")
+    public ResponseEntity<ClienteDto> obtenerInfoCliente(@PathVariable long idCliente) {
+        ClienteDto clienteDto = serviceCliente.ObtenerInfoCliente(idCliente);
+        if (clienteDto != null) {
+            return ResponseEntity.ok(clienteDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDto> deleteCliente(@PathVariable("id") long idCliente) {
+        ResponseDto responseDto = serviceCliente.DeleteInfoCliente(idCliente);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    @DeleteMapping("/{id}/laboral")
+    public ResponseEntity<ResponseDto> deleteInfoLab(@PathVariable("id") long idCliente) {
+        ResponseDto responseDto = serviceCliente.deleteInfoLaboral(idCliente);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
     @PostMapping("/add-inf-lab")
     public ResponseEntity<ResponseDto> crearInfoLab(@RequestBody InfoLaboralClienteDto infoLaboralClienteDto) {
         ResponseDto responseDto = serviceCliente.saveInfoLaboral(infoLaboralClienteDto);
@@ -49,5 +75,32 @@ public class ClienteController {
     @PostMapping("/listarcliente")
     public List<ClienteDto> listarClientes() {
         return serviceCliente.listarClientes();
+    }
+
+    @GetMapping("/{idCliente}/infoLaboral")
+    public ResponseEntity<InfoLaboralClienteDto> obtenerInfoLaboral(@PathVariable long idCliente) {
+        InfoLaboralClienteDto infoLaboral =serviceCliente.obtenerInfoLAboral(idCliente);
+
+        if (infoLaboral != null) {
+            return ResponseEntity.ok(infoLaboral);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
+
+    @GetMapping("/{idCliente}/referencias")
+    public ResponseEntity<List<ReferenciasClientesDto>> obtenerReferencias(@PathVariable long idCliente) {
+        List<ReferenciasClientesDto> referencias = serviceCliente.obtnerReferencias(idCliente);
+        return ResponseEntity.ok(referencias);
+    }
+
+    @PostMapping("/updateinfolab")
+    public ResponseEntity<ResponseDto> modificarInfoLaboral(@RequestBody InfoLaboralClienteDto dto) {
+        ResponseDto response = serviceCliente.modificarInfoLaboral(dto);
+        if (response.getCodeResponse() == 200) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
     }
 }
