@@ -130,6 +130,17 @@ public class ConvertirDatos {
         return lineaCreditoDto;
     }
 
-
-
-}
+        public PrestamoDto convertToDtoPrestamo(Prestamo prestamo) {
+            PrestamoDto prestamoDto = new PrestamoDto();
+            prestamoDto.setIdPrestamo(prestamo.getIdPrestamo());
+            prestamoDto.setMonto(prestamo.getMonto());
+            prestamoDto.setPlazo(prestamo.getPlazo());
+            prestamoDto.setFechaDesembolso(prestamo.getFechaDesembolso());
+            prestamoDto.setFechaSolicitud(prestamo.getFechaSolicitud());
+            prestamoDto.setEstadoSolicitud(prestamo.getEstadoSolicitud());
+            prestamoDto.setDescripcionCredito(prestamo.getDescripcionCredito());
+            prestamoDto.setIdlineaCredito(prestamo.getLineaCredito().getNombreLineaCredito());
+            prestamoDto.setIdcliente(prestamo.getCliente().getNumeroDocumento());
+            return prestamoDto;
+        }
+    }

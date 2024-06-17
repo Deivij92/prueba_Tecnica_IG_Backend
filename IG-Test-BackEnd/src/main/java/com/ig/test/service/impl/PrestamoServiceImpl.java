@@ -99,5 +99,29 @@ public class PrestamoServiceImpl implements PrestamoService {
         return prestamoDtos;
     }
 
+    @Override
+    public List<PrestamoDto> obtnerInfoPrestamo(long idCliente) {
+        List<PrestamoDto> prestamosDtos = new ArrayList<>();
+        try {
+            Optional<Cliente> clienteOptional = Optional.ofNullable(clienteRepository.findById(idCliente));
+            if (clienteOptional.isPresent()) {
+                Cliente cliente = clienteOptional.get();
+                List<Prestamo> prestamos = repositoryPrestamo.findByCliente(cliente);
+                for (Prestamo prestamo : prestamos) {
+                    PrestamoDto prestamoDto = convertirDatos.convertToDtoPrestamo(prestamo);
+                    prestamosDtos.add(prestamoDto);
+                }
+            } else {
+                // Manejar el caso en que el cliente no se encuentra
+                System.out.println("Cliente no encontrado");
+            }
+        } catch (Exception e) {
+            // Manejar cualquier excepción
+            System.out.println("Error al obtener la información de los préstamos: " + e.getMessage());
+        }
+        return prestamosDtos;
+    }
+
+
 
 }

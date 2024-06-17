@@ -29,7 +29,7 @@ public class ReferenciasClientes {
     @Column(nullable = false)
     private String parentezco;
 
-    @ManyToOne( fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Cliente.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 

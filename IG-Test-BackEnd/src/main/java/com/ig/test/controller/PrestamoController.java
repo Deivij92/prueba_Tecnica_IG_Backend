@@ -43,5 +43,10 @@ public class PrestamoController {
         return prestamoService.listarPrestamosSolicitados();
     }
 
+    @GetMapping("/{idCliente}/prestamos")
+    public ResponseEntity<List<PrestamoDto>> obtenerInfoPrestamos(@PathVariable long idCliente) {
+        List<PrestamoDto> prestamos = prestamoService.obtnerInfoPrestamo(idCliente);
+        return ResponseEntity.ok(prestamos);
+    }
 
 }

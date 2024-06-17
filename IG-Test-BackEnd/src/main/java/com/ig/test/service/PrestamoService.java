@@ -12,5 +12,7 @@ public interface PrestamoService {
 
     List<LineaCreditoDto> listarPrestamos();
     List<PrestamoDto> listarPrestamosSolicitados();
+    List<PrestamoDto> obtnerInfoPrestamo(long idcliente);
+
 
 }

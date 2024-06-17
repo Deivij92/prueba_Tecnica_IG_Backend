@@ -33,7 +33,7 @@ public class Prestamo {
     @JoinColumn(name = "linea_credito_id", nullable = false)
     private LineaCredito lineaCredito;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Cliente.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
