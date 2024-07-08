@@ -2,6 +2,9 @@ package com.ig.test.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "INFO_CLIENTE")
 public class Cliente {
@@ -29,6 +32,16 @@ public class Cliente {
 
     @Column(nullable = false)
     private String email;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReferenciasClientes> referenciasClientes = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prestamo> prestamosClientes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InfoLaboralCliente> infoLaboralClientes = new ArrayList<>();
 
     // Getters y setters
 

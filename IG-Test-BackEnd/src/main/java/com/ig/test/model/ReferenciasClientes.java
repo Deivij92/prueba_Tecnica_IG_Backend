@@ -11,7 +11,7 @@ public class ReferenciasClientes {
     @Column(nullable = false)
     private String tipoDocumento;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String numeroDocumento;
 
     @Column(nullable = false)

@@ -64,8 +64,9 @@ public class ConvertirDatos {
         return infoLaboralClienteDto;
     }
 
-    public ReferenciasClientes convertToEntityReferenciasClientes(ReferenciasClientesDto dto) {
+    public ReferenciasClientes convertToEntityReferenciasClientes(ReferenciasClientesDto dto, Cliente cliente) {
         ReferenciasClientes referencia = new ReferenciasClientes();
+        referencia.setId(dto.getIdRef());
         referencia.setNombresApellidos(dto.getNombresApellidos());
         referencia.setResidencia(dto.getResidencia());
         referencia.setTelefono(dto.getTelefono());
@@ -73,6 +74,7 @@ public class ConvertirDatos {
         referencia.setNumeroDocumento(dto.getNumeroDocumento());
         referencia.setTipoDocumento(dto.getTipoDocumento());
         referencia.setParentezco(dto.getParentezco());
+        referencia.setCliente(cliente);
         return referencia;
     }
 

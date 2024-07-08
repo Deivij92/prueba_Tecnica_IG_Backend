@@ -3,7 +3,7 @@ package com.ig.test.dto;
 import java.time.LocalDate;
 
 public class InfoLaboralClienteDto {
-
+    private String actionType;
     private Long idInfoLab;
 
     private String nitEmpresa;
@@ -19,6 +19,14 @@ public class InfoLaboralClienteDto {
     private LocalDate fechaVinculacion;
 
     private String idcliente;
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
 
     public Long getIdInfoLab() {
         return idInfoLab;

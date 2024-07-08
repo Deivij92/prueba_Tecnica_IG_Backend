@@ -2,6 +2,7 @@ package com.ig.test.dto;
 
 public class ReferenciasClientesDto {
 
+    private String actionType;
     private Long idRef;
 
    
@@ -26,6 +27,14 @@ public class ReferenciasClientesDto {
     private String parentezco;
 
     private long Idcliente;
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
 
     public Long getIdRef() {
         return idRef;

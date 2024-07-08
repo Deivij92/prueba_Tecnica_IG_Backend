@@ -1,12 +1,16 @@
 package com.ig.test.service.impl;
 
+import com.ig.test.dto.ClienteDto;
 import com.ig.test.dto.ReferenciasClientesDto;
+import com.ig.test.dto.ResponseDto;
 import com.ig.test.model.Cliente;
 import com.ig.test.model.ReferenciasClientes;
+import com.ig.test.model.repository.RepositoryCliente;
 import com.ig.test.model.repository.RepositoryReferencias;
 import com.ig.test.service.ServiceCliente;
 import com.ig.test.util.ConvertirDatos;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -15,16 +19,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
+ import static org.assertj.core.api.Assertions.*;
 class ClienteServiceImplTest {
-@Autowired
- private ConvertirDatos convertirDatos;
+    @Mock
+    private ConvertirDatos convertirDatos;
 
     @Autowired
     RepositoryReferencias repositoryReferencias;
 
     @Autowired
     private ServiceCliente serviceCliente;
+
+    @Autowired
+    private RepositoryCliente clienteRepository;
 
     @Test
     void deleteInfoReferencia() {
@@ -116,5 +123,24 @@ class ClienteServiceImplTest {
 
     @Test
     void saveCliente() {
+        // Preparar datos de prueba
+        Cliente clienteDto = new Cliente();
+        clienteDto.setId(1L); // Simulamos que el ID se genera automáticamente
+        clienteDto.setTipoDocumento("CC");
+        clienteDto.setNumeroDocumento("123456789");
+
+        clienteDto.setApellidos("Juan");
+        clienteDto.setApellidos("Pérez");
+        clienteDto.setResidencia("Bogotá");
+        clienteDto.setCiudad("Bogotá");
+        clienteDto.setTelefono("123456789");
+        clienteDto.setEmail("juan@example.com");
+
+        Cliente clienteSave = clienteRepository.save(clienteDto);
+        // Configurar el comportamiento del mock
+         assertThat(clienteSave).isNotNull();
+         assertThat(clienteSave).isNotNull();
+         assertThat(clienteSave.getId()).isGreaterThan(0
+         );
     }
 }

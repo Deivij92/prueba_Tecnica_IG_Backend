@@ -1,16 +1,12 @@
 package com.ig.test.controller;
 
 import com.ig.test.dto.*;
-import com.ig.test.service.ServiceCliente;
+import com.ig.test.service.impl.ClienteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.transform.OutputKeys;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -18,103 +14,91 @@ import java.util.List;
 @RequestMapping("api/dinerofacil")
 public class ClienteController {
     @Autowired
-    private ServiceCliente serviceCliente;
-
-
+    private ClienteServiceImpl serviceCliente;
 
     // Endpoint para crear un cliente
-    @PostMapping("/crear")
-    public ResponseEntity<ResponseDto> crearCliente(@RequestBody ClienteDto clienteDto) {
-        ResponseDto responseDto = serviceCliente.saveCliente(clienteDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }@PostMapping("/actualizar")
-    public ResponseEntity<ResponseDto> actualizarCliente(@RequestBody ClienteDto clienteDto) {
-        ResponseDto responseDto = serviceCliente.updateInfoCliente(clienteDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
-    @GetMapping("/{idCliente}")
-    public ResponseEntity<ClienteDto> obtenerInfoCliente(@PathVariable long idCliente) {
-        ClienteDto clienteDto = serviceCliente.ObtenerInfoCliente(idCliente);
-        if (clienteDto != null) {
-            return ResponseEntity.ok(clienteDto);
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(null);
-        }
-    }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseDto> deleteCliente(@PathVariable("id") long idCliente) {
-        ResponseDto responseDto = serviceCliente.DeleteInfoCliente(idCliente);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-    @DeleteMapping("/{id}/laboral")
-    public ResponseEntity<ResponseDto> deleteInfoLab(@PathVariable("id") long idCliente) {
-        ResponseDto responseDto = serviceCliente.deleteInfoLaboral(idCliente);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
-    }
-    @PostMapping("/add-inf-lab")
-    public ResponseEntity<ResponseDto> crearInfoLab(@RequestBody InfoLaboralClienteDto infoLaboralClienteDto) {
-        ResponseDto responseDto = serviceCliente.saveInfoLaboral(infoLaboralClienteDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
-    @PostMapping("/add-referencias")
-    public ResponseEntity<ResponseDto> saveReferencias(@RequestBody List<ReferenciasClientesDto> referenciasClientesDtos) {
-        ResponseDto response;
-        try {
-            response = serviceCliente.saveReferencias(referenciasClientesDtos);
-            if (response.getCodeResponse() == 200) {
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.OK).body(response);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto(500, "Error al procesar la solicitud: " + e.getMessage()));
-        }
-    }
-    @PostMapping("/listarcliente")
-    public List<ClienteDto> listarClientes() {
-        return serviceCliente.listarClientes();
-    }
-    @GetMapping("/{idCliente}/infoLaboral")
-    public ResponseEntity<InfoLaboralClienteDto> obtenerInfoLaboral(@PathVariable long idCliente) {
-        InfoLaboralClienteDto infoLaboral =serviceCliente.obtenerInfoLAboral(idCliente);
+    @PostMapping("/cliente-crud") //Crud del cliente
+    public ResponseEntity<ResponseDto> crudCliente(@RequestBody ClienteDto clienteDto) {
+        ResponseDto responseDto = new ResponseDto();
+        switch (clienteDto.getActionType().toUpperCase()){
+            case "CREATE":
+                responseDto = serviceCliente.saveCliente(clienteDto);
+            break;
+            case "UPDATE":
+                responseDto = serviceCliente.updateCliente(clienteDto.getId(), clienteDto);
+            break;
+            case "INFO-ID":
+                responseDto = serviceCliente.getCliente(clienteDto.getId());
+            break;
+            case "DELETE":
+                responseDto =  serviceCliente.DeleteInfoCliente(clienteDto.getId());
+            break;
+            case "LIST_ALL":
+                responseDto = serviceCliente.getAllClientes();
+                break;
+            default:
+                responseDto.setCodeResponse(300L);
+                responseDto.setMessageResponse("Error validando campos");
+                return new ResponseEntity<>(responseDto, HttpStatus.OK);
 
-        if (infoLaboral != null) {
-            return ResponseEntity.ok(infoLaboral);
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(null);
         }
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
-    @GetMapping("/{idCliente}/referencias")
-    public ResponseEntity<List<ReferenciasClientesDto>> obtenerReferencias(@PathVariable long idCliente) {
-        List<ReferenciasClientesDto> referencias = serviceCliente.obtnerReferencias(idCliente);
-        return ResponseEntity.ok(referencias);
-    }
-    @GetMapping("/referencia/{idReferencia}")
-    public ResponseEntity<ReferenciasClientesDto> obtenerReferencia(@PathVariable long idReferencia) {
-        ReferenciasClientesDto referencia = serviceCliente.obtnerInfoReferencias(idReferencia);
-        if (referencia != null) {
-            return ResponseEntity.ok(referencia);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    @PostMapping("/cliente-lab") //Crud del cliente
+    public ResponseEntity<ResponseDto> crudInfoLab(@RequestBody InfoLaboralClienteDto lab) {
+        ResponseDto responseDto = new ResponseDto();
+        switch (lab.getActionType().toUpperCase()){
+            case "CREATE":
+                responseDto = serviceCliente.saveInfoLaboral(lab);
+            break;
+            case "UPDATE":
+                responseDto = serviceCliente.modificarInfoLaboral(lab);
+            break;
+            case "INFO-ID":
+                responseDto = serviceCliente.obtenerInfoLAboral(Long.parseLong(lab.getIdcliente()));
+            break;
+            case "DELETE":
+                responseDto =  serviceCliente.deleteInfoLab(lab.getIdInfoLab());
+            break;
+            case "LIST_ALL":
+                //responseDto = serviceCliente.getAllClientes();
+                break;
+            default:
+                responseDto.setCodeResponse(300L);
+                responseDto.setMessageResponse("Error validando campos");
+                return new ResponseEntity<>(responseDto, HttpStatus.OK);
+
         }
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
-    @PostMapping("/updateinfolab")
-    public ResponseEntity<ResponseDto> modificarInfoLaboral(@RequestBody InfoLaboralClienteDto dto) {
-        ResponseDto response = serviceCliente.modificarInfoLaboral(dto);
-        if (response.getCodeResponse() == 200) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PostMapping("/cliente-ref-crud") //Crud del cliente
+    public ResponseEntity<ResponseDto> crudReferencia(@RequestBody List<ReferenciasClientesDto> ref, @PathVariable String action, @PathVariable long idRef) {
+        ResponseDto responseDto = new ResponseDto();
+        switch (ref.get(0).getActionType()){
+            case "CREATE":
+                responseDto = serviceCliente.saveReferencias((List<ReferenciasClientesDto>) ref);
+            break;
+            case "UPDATE":
+                responseDto = serviceCliente.saveReferencias((List<ReferenciasClientesDto>) ref);
+            break;
+            case "INFO-ID":
+                responseDto = serviceCliente.obtnerInfoReferencias(ref.get(0).getIdRef());
+            break;
+            case "DELETE":
+                responseDto =  serviceCliente.deleteInfoReferencia(ref.get(0).getIdRef());
+            break;
+            case "LIST_ALL":
+                responseDto = serviceCliente.obtnerListaReferencias(ref.get(0).getIdcliente());
+                break;
+            default:
+                responseDto.setCodeResponse(300L);
+                responseDto.setMessageResponse("Error validando campos");
+                return new ResponseEntity<>(responseDto, HttpStatus.OK);
+
         }
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
-    @DeleteMapping("/deleteref/{idRef}")
-    public ResponseEntity<ResponseDto> eliminarReferencia(@PathVariable long idRef) {
-        ResponseDto response = serviceCliente.deleteInfoRef(idRef);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-    @PutMapping("/updatereferencia")
-    public ResponseEntity<ResponseDto> actualizarReferencia(@RequestBody ReferenciasClientesDto dto) {
-        ResponseDto response = serviceCliente.UpdateInfoRef(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+
+
+
 }

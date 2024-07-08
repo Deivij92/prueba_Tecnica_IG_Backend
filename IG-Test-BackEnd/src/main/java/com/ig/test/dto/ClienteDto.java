@@ -1,6 +1,8 @@
 package com.ig.test.dto;
 
 public class ClienteDto {
+
+    private String actionType;
     private Long id;
 
     private String tipoDocumento;
@@ -16,6 +18,14 @@ public class ClienteDto {
     private String telefono;
 
     private String email;
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
 
     public Long getId() {
         return id;

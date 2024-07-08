@@ -4,10 +4,11 @@ import com.ig.test.dto.ClienteDto;
 import com.ig.test.dto.InfoLaboralClienteDto;
 import com.ig.test.dto.ReferenciasClientesDto;
 import com.ig.test.dto.ResponseDto;
+import com.ig.test.model.persistence.DataAccesObject;
 
 import java.util.List;
 
-public interface ServiceCliente {
+public interface ServiceCliente extends DataAccesObject<ClienteDto> {
     ResponseDto saveCliente(ClienteDto clienteDto);
     ClienteDto ObtenerInfoCliente(long idcleinte);
     List<ClienteDto> listarClientes();

@@ -11,7 +11,7 @@ public class InfoLaboralCliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nitEmpresa;
 
     @Column(nullable = false)
